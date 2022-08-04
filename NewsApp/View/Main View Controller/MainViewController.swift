@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol newsNetworkDelegate{
+    func fetchNews(news: )
+    func 
+}
 class MainViewController: UIViewController{
     
     private lazy var mainLabel:UILabel = {
@@ -45,6 +49,7 @@ class MainViewController: UIViewController{
         tf.backgroundColor = .clear
         tf.delegate = self
         
+        
         tf.layer.cornerRadius = 5
         tf.layer.borderColor = UIColor(red: 0.762, green: 0.762, blue: 0.762, alpha: 1).cgColor
         tf.layer.borderWidth = 0.5
@@ -62,9 +67,12 @@ class MainViewController: UIViewController{
         tv.delegate = self
         tv.register(UINib(nibName: "MainTableViewCell", bundle: nil), forCellReuseIdentifier: "cell")
         tv.rowHeight = 230
+        tv.separatorStyle = .none
         
         return tv
     }()
+    
+    var newsNetworkManager = NewsNetworkManager.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -74,8 +82,8 @@ class MainViewController: UIViewController{
         detailLabelSetup()
         searchTextFieldSetup()
         mainTableViewSetup()
-        
         searchImageSetup()
+        
     }
     
     func mainLabelSetup(){
@@ -132,7 +140,7 @@ class MainViewController: UIViewController{
         searchImage.translatesAutoresizingMaskIntoConstraints = false
         
         let imageConstraints = [
-            searchImage.trailingAnchor.constraint(equalTo: searchTextField.trailingAnchor, constant: 0),
+            searchImage.trailingAnchor.constraint(equalTo: searchTextField.trailingAnchor, constant: -15),
             searchImage.centerYAnchor.constraint(equalTo: searchTextField.centerYAnchor),
             searchImage.heightAnchor.constraint(equalToConstant: 24),
             searchImage.widthAnchor.constraint(equalToConstant: 24)
@@ -182,6 +190,10 @@ extension MainViewController: UITextFieldDelegate{
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
+        
+        if let text = textField.text{
+            newsNetworkManager.getNews(keyWord: text, language: "en")
+        }
         
         return true
     }
