@@ -11,40 +11,70 @@ class MainViewController: UIViewController{
     
     private lazy var mainLabel:UILabel = {
         let label = UILabel ()
-        label.text = "Text"
-        label.font = UIFont.systemFont(ofSize: 20, weight: .bold)
+        label.text = "Путешествуйте"
+        label.font = UIFont.systemFont(ofSize: 24, weight: .medium)
         label.backgroundColor = .clear
         label.textAlignment = .center
         return label
     }()
     
+    private lazy var subMainLabel:UILabel = {
+       let subLabel = UILabel ()
+        subLabel.text = "Почувствуйте прилив энергии"
+        subLabel.font = UIFont.systemFont(ofSize: 24, weight: .medium)
+        subLabel.textAlignment = .center
+        
+        return subLabel
+    }()
+    
+    private lazy var detailLabel:UILabel = {
+       let detailLabel = UILabel ()
+        detailLabel.text = "Мы поможем вам исследовать, сравнить и забронировать впечатления - все в одном месте."
+        detailLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
+        detailLabel.textAlignment = .center
+        detailLabel.numberOfLines = 0
+        
+        return detailLabel
+    }()
+    
     private lazy var searchTextField:UITextField = {
        let tf = UITextField()
-        tf.font = UIFont.systemFont(ofSize: 24, weight: .black)
-        tf.placeholder = "Type a keyword"
-        tf.textAlignment = .center
-        tf.backgroundColor = .lightGray
+        tf.attributedPlaceholder = NSAttributedString(string: "Куда хотите поехать?", attributes: [NSAttributedString.Key.foregroundColor: UIColor.blue])
+        tf.font = UIFont.systemFont(ofSize: 12, weight: .regular)
+        tf.textAlignment = .left
+        tf.backgroundColor = .clear
         tf.delegate = self
         
+        tf.layer.cornerRadius = 5
+        tf.layer.borderColor = UIColor(red: 0.762, green: 0.762, blue: 0.762, alpha: 1).cgColor
+        tf.layer.borderWidth = 0.5
         
         return tf
     }()
+    
+    let searchImage = UIImageView(image: UIImage(named: "search")!)
+    
     
     private lazy var  mainTableView : UITableView = {
         let tv = UITableView()
         
         tv.dataSource = self
         tv.delegate = self
+        tv.register(UINib(nibName: "MainTableViewCell", bundle: nil), forCellReuseIdentifier: "cell")
+        tv.rowHeight = 230
         
         return tv
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .green
+        view.backgroundColor = .white
         mainLabelSetup()
-      searchTextFieldSetup()
+        subLabelSetup()
+        searchTextFieldSetup()
         mainTableViewSetup()
+        detailLabelSetup()
+        searchImageSetup()
     }
     
     func mainLabelSetup(){
@@ -52,10 +82,34 @@ class MainViewController: UIViewController{
         
         mainLabel.translatesAutoresizingMaskIntoConstraints = false
         let mainLabelConstraints = [
-            mainLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            mainLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 58),
             mainLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ]
         NSLayoutConstraint.activate(mainLabelConstraints)
+    }
+    
+    func subLabelSetup(){
+        view.addSubview(subMainLabel)
+        
+        subMainLabel.translatesAutoresizingMaskIntoConstraints = false
+        let subMainLabelConstraints = [
+            subMainLabel.topAnchor.constraint(equalTo: mainLabel.bottomAnchor, constant: 0),
+            subMainLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ]
+        NSLayoutConstraint.activate(subMainLabelConstraints)
+    }
+    
+   func detailLabelSetup(){
+       view.addSubview(detailLabel)
+       
+       detailLabel.translatesAutoresizingMaskIntoConstraints = false
+       let detailLabelConstraints = [
+        detailLabel.topAnchor.constraint(equalTo: subMainLabel.bottomAnchor, constant: 11),
+        detailLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 42),
+        detailLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -42),
+        detailLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+       ]
+       NSLayoutConstraint.activate(detailLabelConstraints)
     }
     
     func searchTextFieldSetup(){
@@ -64,7 +118,7 @@ class MainViewController: UIViewController{
         searchTextField.translatesAutoresizingMaskIntoConstraints = false
         
         let tfConstraints = [
-            searchTextField.topAnchor.constraint(equalTo: mainLabel.bottomAnchor, constant: 10),
+            searchTextField.topAnchor.constraint(equalTo: view.topAnchor, constant: 220),
             searchTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             searchTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             searchTextField.heightAnchor.constraint(equalToConstant: 60)
@@ -72,11 +126,22 @@ class MainViewController: UIViewController{
         NSLayoutConstraint.activate(tfConstraints)
     }
     
+    func searchImageSetup(){
+        searchTextField.addSubview(searchImage)
+        searchImage.translatesAutoresizingMaskIntoConstraints = false
+        
+        let imageConstraints = [
+            searchImage.trailingAnchor.constraint(equalTo: searchTextField.trailingAnchor, constant: 0)
+            
+        ]
+        NSLayoutConstraint.activate(imageConstraints)
+    }
+    
     func mainTableViewSetup(){
         view.addSubview(mainTableView)
         mainTableView.translatesAutoresizingMaskIntoConstraints = false
         let contraints = [
-            mainTableView.topAnchor.constraint(equalTo: searchTextField.topAnchor, constant: 20),
+            mainTableView.topAnchor.constraint(equalTo: searchTextField.bottomAnchor, constant: 27),
             mainTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             mainTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             mainTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 20)
@@ -92,16 +157,30 @@ extension MainViewController:UITableViewDelegate, UITableViewDataSource{
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! MainTableViewCell
+        
+        cell.layer.cornerRadius = 8
+        cell.layer.masksToBounds = true
+        
+        cell.mainImageView.image = UIImage(named: "photo1")
         
         return cell
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: false)
+    }
+ 
     
 }
 
 extension MainViewController:UITextFieldDelegate{
     func textFieldShouldClear(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
+        
+        if let text = textField.text{
+            mainLabel.text = text
+        }
+        return true
     }
 }
