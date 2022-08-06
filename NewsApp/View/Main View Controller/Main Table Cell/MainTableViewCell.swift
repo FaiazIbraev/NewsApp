@@ -26,6 +26,10 @@ class MainTableViewCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
-    
+    func setup(article: Article){
+        titleLabel.text = article.author
+        subtitleLabel.text = article.title
+        print(article.urtToImage)
+    }
     
 }

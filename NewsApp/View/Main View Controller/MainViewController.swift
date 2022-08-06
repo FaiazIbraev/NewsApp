@@ -7,10 +7,7 @@
 
 import UIKit
 
-protocol newsNetworkDelegate{
-    func fetchNews(news: )
-    func 
-}
+
 class MainViewController: UIViewController{
     
     private lazy var mainLabel:UILabel = {
@@ -73,6 +70,7 @@ class MainViewController: UIViewController{
     }()
     
     var newsNetworkManager = NewsNetworkManager.shared
+    var newsData: [Article] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -83,6 +81,7 @@ class MainViewController: UIViewController{
         searchTextFieldSetup()
         mainTableViewSetup()
         searchImageSetup()
+        newsNetworkManager.newsDelegate = self
         
     }
     
@@ -165,11 +164,14 @@ class MainViewController: UIViewController{
 
 extension MainViewController:UITableViewDelegate, UITableViewDataSource{
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+        return newsData.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! MainTableViewCell
+        let article = newsData[indexPath.row]
+        
+        cell.setup(article: article)
         
         cell.layer.cornerRadius = 8
         cell.layer.masksToBounds = true
@@ -181,6 +183,12 @@ extension MainViewController:UITableViewDelegate, UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
+        
+        let article = newsData[indexPath.row]
+        
+        let vc = DetailedViewController()
+        vc.article = article
+        present(vc, animated: true)
     }
     
     
@@ -197,4 +205,19 @@ extension MainViewController: UITextFieldDelegate{
         
         return true
     }
+}
+
+extension MainViewController: NewsNetworkDelegate{
+    func fetchNews(news: NewsModelAPI) {
+        self.newsData = news.articles
+        DispatchQueue.main.async {
+            self.mainTableView.reloadData()
+        }
+    }
+    
+    func errorFetchingNews(error: Error) {
+        print(error)
+    }
+    
+    
 }
