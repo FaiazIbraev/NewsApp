@@ -15,7 +15,7 @@ class NewsNetworkManager {
     
     static let shared = NewsNetworkManager()
     var newsDelegate: NewsNetworkDelegate?
-    let mainUrl = "https://newsapi.org/v2/everything?apiKey=40becfa582e942ec840433582a453eed&sortBy=popularity"
+    let mainUrl = "https://newsapi.org/v2/everything?apiKey=40becfa582e942ec840433582a453eed&sortBy=popularity&pageSize=5&page=1"
     
     func getNews(keyWord: String, language: String){
         let urlString = "\(mainUrl)&q=\(keyWord)&language=\(language)"

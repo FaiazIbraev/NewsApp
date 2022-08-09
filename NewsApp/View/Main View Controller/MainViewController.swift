@@ -31,7 +31,7 @@ class MainViewController: UIViewController{
     private lazy var detailLabel:UILabel = {
         let detailLabel = UILabel ()
         detailLabel.text = "Мы поможем вам исследовать, сравнить и забронировать впечатления - все в одном месте."
-        detailLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
+        detailLabel.font = UIFont.systemFont(ofSize: 18, weight: .regular)
         detailLabel.textAlignment = .center
         detailLabel.numberOfLines = 0
         
@@ -41,7 +41,7 @@ class MainViewController: UIViewController{
     private lazy var searchTextField:UITextField = {
         let tf = UITextField()
         tf.attributedPlaceholder = NSAttributedString(string: "Куда хотите поехать?", attributes: [NSAttributedString.Key.foregroundColor: UIColor.blue])
-        tf.font = UIFont.systemFont(ofSize: 12, weight: .regular)
+        tf.font = UIFont.systemFont(ofSize: 16, weight: .regular)
         tf.textAlignment = .left
         tf.backgroundColor = .clear
         tf.delegate = self
@@ -54,8 +54,17 @@ class MainViewController: UIViewController{
         return tf
     }()
     
-    let searchImage = UIImageView(image: UIImage(named: "search")!)
+//    let searchImage = UIImageView(image: UIImage(named: "search")!)
     
+    
+    private lazy var mainSwitcher: UISwitch = {
+        let sw = UISwitch()
+        
+        sw.isOn = true
+        sw.addTarget(self, action: #selector(switcherTapped), for: .valueChanged)
+        
+        return sw
+    }()
     
     private lazy var  mainTableView : UITableView = {
         let tv = UITableView()
@@ -71,6 +80,7 @@ class MainViewController: UIViewController{
     
     var newsNetworkManager = NewsNetworkManager.shared
     var newsData: [Article] = []
+    var isEnglish: Bool = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -79,8 +89,9 @@ class MainViewController: UIViewController{
         subLabelSetup()
         detailLabelSetup()
         searchTextFieldSetup()
+        mainSwitcherSetup()
         mainTableViewSetup()
-        searchImageSetup()
+//      searchImageSetup()
         newsNetworkManager.newsDelegate = self
         
     }
@@ -134,25 +145,37 @@ class MainViewController: UIViewController{
         NSLayoutConstraint.activate(tfConstraints)
     }
     
-    func searchImageSetup(){
-        searchTextField.addSubview(searchImage)
-        searchImage.translatesAutoresizingMaskIntoConstraints = false
+//    func searchImageSetup(){
+//        searchTextField.addSubview(searchImage)
+//        searchImage.translatesAutoresizingMaskIntoConstraints = false
+//
+//        let imageConstraints = [
+//            searchImage.trailingAnchor.constraint(equalTo: searchTextField.trailingAnchor, constant: -15),
+//            searchImage.centerYAnchor.constraint(equalTo: searchTextField.centerYAnchor),
+//            searchImage.heightAnchor.constraint(equalToConstant: 24),
+//            searchImage.widthAnchor.constraint(equalToConstant: 24)
+//
+//        ]
+//        NSLayoutConstraint.activate(imageConstraints)
+//    }
+    
+    func mainSwitcherSetup(){
+        view.addSubview(mainSwitcher)
+        mainSwitcher.translatesAutoresizingMaskIntoConstraints = false
         
-        let imageConstraints = [
-            searchImage.trailingAnchor.constraint(equalTo: searchTextField.trailingAnchor, constant: -15),
-            searchImage.centerYAnchor.constraint(equalTo: searchTextField.centerYAnchor),
-            searchImage.heightAnchor.constraint(equalToConstant: 24),
-            searchImage.widthAnchor.constraint(equalToConstant: 24)
-            
+        let constraints = [
+            mainSwitcher.topAnchor.constraint(equalTo: searchTextField.bottomAnchor, constant: 10),
+            mainSwitcher.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            mainSwitcher.heightAnchor.constraint(equalToConstant: 40)
         ]
-        NSLayoutConstraint.activate(imageConstraints)
+        NSLayoutConstraint.activate(constraints)
     }
     
     func mainTableViewSetup(){
         view.addSubview(mainTableView)
         mainTableView.translatesAutoresizingMaskIntoConstraints = false
         let contraints = [
-            mainTableView.topAnchor.constraint(equalTo: searchTextField.bottomAnchor, constant: 27),
+            mainTableView.topAnchor.constraint(equalTo: searchTextField.bottomAnchor, constant: 60),
             mainTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             mainTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             mainTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 20)
@@ -176,7 +199,7 @@ extension MainViewController:UITableViewDelegate, UITableViewDataSource{
         cell.layer.cornerRadius = 8
         cell.layer.masksToBounds = true
         
-        cell.mainImageView.image = UIImage(named: "photo1")
+//        cell.mainImageView.image = UIImage(named: "photo1")
         
         return cell
     }
@@ -200,7 +223,7 @@ extension MainViewController: UITextFieldDelegate{
         textField.resignFirstResponder()
         
         if let text = textField.text{
-            newsNetworkManager.getNews(keyWord: text, language: "en")
+            newsNetworkManager.getNews(keyWord: text, language: self.isEnglish ? "en" : "ru")
         }
         
         return true
@@ -218,6 +241,10 @@ extension MainViewController: NewsNetworkDelegate{
     func errorFetchingNews(error: Error) {
         print(error)
     }
-    
-    
+}
+
+extension MainViewController{
+    @objc func switcherTapped(){
+        self.isEnglish = mainSwitcher.isOn
+    }
 }

@@ -14,6 +14,7 @@ class MainTableViewCell: UITableViewCell {
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var subtitleLabel: UILabel!
     
+    let imageDownloader = ImageManager.shared
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -29,7 +30,14 @@ class MainTableViewCell: UITableViewCell {
     func setup(article: Article){
         titleLabel.text = article.author
         subtitleLabel.text = article.title
-        print(article.urtToImage)
+        
+        if let urlImage = article.urtToImage{
+            imageDownloader.createRequest(urlString: urlImage) { [weak self] (data) in
+                DispatchQueue.main.async {
+                    self?.mainImageView.image = UIImage(data: data)
+                }
+            }
+        }
     }
     
 }
