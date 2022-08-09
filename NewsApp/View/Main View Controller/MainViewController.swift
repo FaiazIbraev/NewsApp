@@ -40,10 +40,10 @@ class MainViewController: UIViewController{
     
     private lazy var searchTextField:UITextField = {
         let tf = UITextField()
-        tf.attributedPlaceholder = NSAttributedString(string: "Куда хотите поехать?", attributes: [NSAttributedString.Key.foregroundColor: UIColor.blue])
+        tf.attributedPlaceholder = NSAttributedString(string: "Что вы ищете?", attributes: [NSAttributedString.Key.foregroundColor: UIColor.white])
         tf.font = UIFont.systemFont(ofSize: 16, weight: .regular)
         tf.textAlignment = .left
-        tf.backgroundColor = .clear
+        tf.backgroundColor = .darkGray
         tf.delegate = self
         
         

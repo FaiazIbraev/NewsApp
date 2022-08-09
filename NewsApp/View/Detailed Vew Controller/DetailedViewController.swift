@@ -34,11 +34,19 @@ class DetailedViewController: UIViewController {
         tv.textAlignment = .left
         tv.font = UIFont.systemFont(ofSize: 20, weight: .regular)
         tv.textColor = .black
-        tv.backgroundColor = .lightGray
+        tv.backgroundColor = .gray
         return tv
     }()
     
+    private lazy var imageView:UIImageView = {
+        let image = UIImageView()
+        image.layer.borderWidth = 10
+        
+        return image
+    }()
+    
     var article: Article?
+    let imageDownloader = ImageManager.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,6 +55,7 @@ class DetailedViewController: UIViewController {
         mainLabelSetup()
         subLabelSetup()
         textViewSetup()
+        imageViewSetup()
         initialSetup()
  
         if let article = article {
@@ -86,7 +95,20 @@ class DetailedViewController: UIViewController {
             textView.topAnchor.constraint(equalTo: subTitle.bottomAnchor, constant: 20),
             textView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             textView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            textView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 20)
+            textView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -220)
+        ]
+        NSLayoutConstraint.activate(constraints)
+    }
+    
+    func imageViewSetup(){
+        view.addSubview(imageView)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        
+        let constraints = [
+            imageView.heightAnchor.constraint(equalToConstant: 200),
+            imageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            imageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            imageView.topAnchor.constraint(equalTo: textView.bottomAnchor, constant: 20)
         ]
         NSLayoutConstraint.activate(constraints)
     }
@@ -95,6 +117,17 @@ class DetailedViewController: UIViewController {
         mainTitle.text = article?.author
         subTitle.text = article?.title
         textView.text = article?.content
+        
+        if let urlImage = article?.urlToImage{
+            imageDownloader.createRequest(urlString: urlImage) { [weak self] (data) in
+                DispatchQueue.main.async {
+                    self?.imageView.image = UIImage(data: data)
+                }
+            }
+        }
+        
+        
+
     }
     
 }

@@ -31,7 +31,7 @@ class MainTableViewCell: UITableViewCell {
         titleLabel.text = article.author
         subtitleLabel.text = article.title
         
-        if let urlImage = article.urtToImage{
+        if let urlImage = article.urlToImage{
             imageDownloader.createRequest(urlString: urlImage) { [weak self] (data) in
                 DispatchQueue.main.async {
                     self?.mainImageView.image = UIImage(data: data)
